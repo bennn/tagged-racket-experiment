@@ -1,0 +1,15 @@
+#lang tagged/racket
+
+(struct A ((x : Integer) (y : (Listof Integer)) (z : (-> Integer Integer))))
+
+(define a (A 1 '(1) (lambda ((x : Integer)) (+ x x))))
+
+(+ ((A-z a) (A-x a)) (car (A-y a)))
+
+
+(: f (-> (Listof A) Integer))
+(define (f x)
+  (define mya (car x))
+  (A-x mya))
+
+(f (list a))
