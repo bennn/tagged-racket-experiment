@@ -19,7 +19,7 @@
  [empty-vector/sc static-contract?])
 
 (define-terminal-sc list-length/sc (n) #:flat
-   #`(λ (l) (and (list? l) (= #,n (length l)))))
+   #`(λ (l) (and (list? l) (= #,n (length l))))) ;;bg; TODO this is not a useful O(1) ... but its also unused
 
 (define-terminal-sc vector-length/sc (n) #:flat
    #`(λ (l) (and (vector? l) (= #,n (vector-length l)))))
@@ -27,7 +27,7 @@
 (define (list-length/sc* n)
   (if (zero? n)
       empty-list/sc
-      empty-vector/sc))
+      (list-length/sc n)))
 
 
 (define empty-list/sc (flat/sc #'null?))

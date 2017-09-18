@@ -25,12 +25,15 @@
     (module->namespace 'racket/unsafe/ops)
     #t))
 
-(define (maybe-defend body)
+(define (maybe-defend body ctc-cache sc-cache)
   ;; TODO maybe check (authorized-code-inspector?)
-  (begin
-    (do-time "Starting defender")
-    (begin0 (stx-map defend-top body)
-      (do-time "Defended"))))
+  (do-time "Starting defender")
+  (define extra-def* (box '()))
+  (define body+
+    (for/list ([b (in-list (syntax-e body))])
+      (defend-top b ctc-cache sc-cache extra-def*)))
+  (do-time "Defended")
+  (append (reverse (unbox extra-def*)) body+))
 
 (define (maybe-optimize body)
   ;; do we optimize?

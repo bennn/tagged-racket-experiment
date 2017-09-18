@@ -6,6 +6,7 @@
   "../../utils/utils.rkt"
   "../structures.rkt"
   "../constraints.rkt"
+  "../logger.rkt"
   "../terminal.rkt"
   racket/match
   (contract-req)
@@ -47,6 +48,10 @@
        (match v
         [(parametric-combinator (list arg) vars)
          #`(parametric->/c #,vars #,(f arg))]))
+     (define (sc->tag-sc v f)
+       (match-define (parametric-combinator (list arg) _) v)
+       ;;bg; assuming it has a tag (guarded)
+       (f arg))
      (define (sc->constraints v f)
        (match v
         [(parametric-combinator (list arg) vars)
@@ -82,6 +87,10 @@
        (match v
         [(sealing-combinator (list arg) vars members)
          #`(sealing->/c #,(car vars) #,members #,(f arg))]))
+     (define (sc->tag-sc v f)
+       (match-define (sealing-combinator (list arg) _ _) v)
+       (log-static-contract-warning "sealing/sc ~a" v)
+       (f arg))
      (define (sc->constraints v f)
        (match v
         [(sealing-combinator (list arg) vars members)

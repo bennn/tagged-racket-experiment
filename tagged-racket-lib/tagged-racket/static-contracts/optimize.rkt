@@ -26,8 +26,8 @@
     ;; none/sc cases
     [(listof/sc: (none/sc:)) empty-list/sc]
     [(list/sc: sc1 ... (none/sc:) sc2 ...) none/sc]
-    ;;bg;[(set/sc: (none/sc:)) empty-set/sc]
-    ;;bg;[(syntax/sc: (none/sc:)) none/sc]
+    [(set/sc: (none/sc:)) empty-set/sc]
+    [(syntax/sc: (none/sc:)) none/sc]
     ;; The following are unsound because chaperones allow operations on these data structures to
     ;; can call continuations and thus be useful even if they cannot return values.
     ;[(vectorof/sc: (none/sc:)) empty-vector/sc]
@@ -38,19 +38,19 @@
     ;[(hash/sc: key/sc (none/sc:)) empty-hash/sc]
 
     ;; any/sc cases
-    ;;bg;[(cons/sc: (any/sc:) (any/sc:)) cons?/sc]
+    [(cons/sc: (any/sc:) (any/sc:)) cons?/sc]
     [(listof/sc: (any/sc:)) list?/sc]
     [(list/sc: (and scs (any/sc:)) ...) (list-length/sc (length scs))]
-    ;;bg;[(vectorof/sc: (any/sc:)) vector?/sc]
-    ;;bg;[(vector/sc: (and scs (any/sc:)) ...) (vector-length/sc (length scs))]
-    ;;bg;[(set/sc: (any/sc:)) set?/sc]
-    ;;bg;[(box/sc: (any/sc:)) box?/sc]
-    ;;bg;[(syntax/sc: (any/sc:)) syntax?/sc]
-    ;;bg;[(promise/sc: (any/sc:)) promise?/sc]
-    ;;bg;[(hash/sc: (any/sc:) (any/sc:)) hash?/sc]
-    ;;bg;[(mutable-hash/sc: (any/sc:) (any/sc:)) mutable-hash?/sc]
-    ;;bg;[(immutable-hash/sc: (any/sc:) (any/sc:)) immutable-hash?/sc]
-    ;;bg;[(weak-hash/sc: (any/sc:) (any/sc:)) weak-hash?/sc]
+    [(vectorof/sc: (any/sc:)) vector?/sc]
+    [(vector/sc: (and scs (any/sc:)) ...) (vector-length/sc (length scs))]
+    [(set/sc: (any/sc:)) set?/sc]
+    [(box/sc: (any/sc:)) box?/sc]
+    [(syntax/sc: (any/sc:)) syntax?/sc]
+    [(promise/sc: (any/sc:)) promise?/sc]
+    [(hash/sc: (any/sc:) (any/sc:)) hash?/sc]
+    [(mutable-hash/sc: (any/sc:) (any/sc:)) mutable-hash?/sc]
+    [(immutable-hash/sc: (any/sc:) (any/sc:)) immutable-hash?/sc]
+    [(weak-hash/sc: (any/sc:) (any/sc:)) weak-hash?/sc]
 
     ;; or/sc cases
     [(or/sc: scs ...)

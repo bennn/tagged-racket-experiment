@@ -11,14 +11,15 @@
   syntax/private/id-table
   (for-template racket/base racket/contract)
   "combinators.rkt"
-  "combinators/name.rkt"
   "combinators/case-lambda.rkt"
+  "combinators/name.rkt"
   "combinators/parametric.rkt"
-  "kinds.rkt"
-  "parametric-check.rkt"
-  "structures.rkt"
   "constraints.rkt"
-  "equations.rkt")
+  "equations.rkt"
+  "kinds.rkt"
+  "logger.rkt"
+  "parametric-check.rkt"
+  "structures.rkt")
 
 (provide/cond-contract
  [instantiate
@@ -33,6 +34,8 @@
            compute-recursive-kinds
            instantiate/inner))
 
+(require (for-syntax racket/base))
+
 ;; kind is the greatest kind of contract that is supported, if a greater kind would be produced the
 ;; fail procedure is called.
 ;;
@@ -40,14 +43,17 @@
 ;; type->contract in a given contract fixup pass. If it's #f then that means don't
 ;; do any sharing (useful for testing).
 (define (instantiate sc fail [kind 'impersonator] #:cache [cache #f])
+  (log-static-contract-info "begin instantiate ~a" sc)
   (if (parametric-check sc)
       (fail #:reason "multiple parametric contracts are not supported")
       (with-handlers [(exn:fail:constraint-failure?
                         (lambda (exn) (fail #:reason (exn:fail:constraint-failure-reason exn))))]
-        (instantiate/inner sc
+        (define r (instantiate/inner sc
           (compute-recursive-kinds
             (contract-restrict-recursive-values (compute-constraints sc kind)))
-          cache))))
+          cache))
+        (log-static-contract-info "end instantiate~n  defs = ~a~n  ctc = ~a" (map syntax->datum (car r)) (syntax->datum (cadr r)))
+        r)))
 
 ;; computes the definitions that are in / used by `sc`
 ;; `(get-all-name-defs)` is not what we want directly, since it also includes

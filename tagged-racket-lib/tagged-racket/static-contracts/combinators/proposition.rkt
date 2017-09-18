@@ -1,9 +1,5 @@
 #lang racket/base
 
-;; Static contracts that are terminal and have no sub parts.
-;; Unlike contracts defined with define-terminal-contract, equality of these contracts is based solely
-;; on identity. Thus they are most useful for contracts which have no meaningful structure.
-;; Ex: (flat/sc #'number?)
 
 (require
   "../../utils/utils.rkt"
@@ -70,6 +66,8 @@
       #`(flat-named-contract
          #,name
          (λ (#,(sc->c arg f)) #,(sc->c body f)))])
+   (define (sc->tag-sc v f)
+     (raise-user-error 'sc->tag-sc "not implemented ~a" v))
    (define/match (sc->constraints v f)
      [((flat-named-lambda/sc _ arg body) f)
       (merge-restricts 'flat (f arg) (f body))])
@@ -102,6 +100,8 @@
    (define/match (sc->contract v f)
      [((is-flat-type/sc obj type) f)
       #`(#,(f type) #,(sc->c obj f))])
+   (define (sc->tag-sc v f)
+     (raise-user-error 'sc->tag-sc "not implemented ~a" v))
    (define/match (sc->constraints v f)
      [((is-flat-type/sc obj type) f)
       (merge-restricts 'flat (f obj) (f type))])])
@@ -125,6 +125,8 @@
    (define/generic sc->c sc->contract)
    (define/match (sc->contract v f)
      [((not-flat-type/sc obj type) f) #`(not (#,(f type) #,(sc->c obj f)))])
+   (define (sc->tag-sc v f)
+     (raise-user-error 'sc->tag-sc "not implemented ~a" v))
    (define/match (sc->constraints v f)
      [((not-flat-type/sc obj type) f)
       (merge-restricts 'flat (f obj) (f type))])])
@@ -148,6 +150,8 @@
    (define/generic sc->c sc->contract)
    (define/match (sc->contract v f)
      [((leq/sc lhs rhs) f) #`(<= #,(sc->c lhs f) #,(sc->c rhs f))])
+   (define (sc->tag-sc v f)
+     (raise-user-error 'sc->tag-sc "not implemented ~a" v))
    (define/match (sc->constraints v f)
      [((leq/sc lhs rhs) f)
       (merge-restricts 'flat (f lhs) (f rhs))])])
@@ -168,6 +172,8 @@
      [((and-prop/sc args) f)
       #`(and #,@(for/list ([arg (in-list args)])
                   (sc->c arg f)))])
+   (define (sc->tag-sc v f)
+     (raise-user-error 'sc->tag-sc "not implemented ~a" v))
    (define/match (sc->constraints v f)
      [((and-prop/sc args) f)
       (merge-restricts* 'flat (map f args))])])
@@ -188,6 +194,8 @@
      [((or-prop/sc args) f)
       #`(or #,@(for/list ([arg (in-list args)])
                  (sc->c arg f)))])
+   (define (sc->tag-sc v f)
+     (raise-user-error 'sc->tag-sc "not implemented ~a" v))
    (define/match (sc->constraints v f)
      [((or-prop/sc args) f)
       (merge-restricts* 'flat (map f args))])])

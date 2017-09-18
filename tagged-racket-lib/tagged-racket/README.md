@@ -2,31 +2,48 @@ tagged-diverge
 ===
 
 TODO
-- [ ] provides
+- [X] provides
   - [X] via macros
   - [X] via chaperones
-  - [ ] compare
-- [ ] how to map? other destructors
+  - [X] compare NO BIG DIFFERENCE
+- [X] re-implement via static-contracts
+  - [X] hack
+  - [X] add logging
+  - [X] test
+
+- [X] debug zombie, why so slowwww?
+  - 6 seconds on 0001 0011 1001 1011
+  - was rec-contracts getting compiled to chaperones
+- [X] protect functions with wrappers
+- [X] protect functions with contracts
+
+- [ ] why is contracts SO MUCH slower?
+- [ ] run zordoz w/ wrappers (maybe remove keywords?)
+
+- [ ] build Gamma while defending, to know local & global functions
+      (model Typed Racket's lexical environment --- can't re-use
+       exactly the env. because it goes away)
+
+1. Make simplest sound version,
+   - always check domain
+   - always check codomain
+   (already handled range and non-higher-order domains)
+2. try easy optimizations
+   - trusted codomains
+3. 
+
 
 - [ ] LNM tagged version (plot module is trouble)
 - [ ] determinance GTP
 
 - [ ] make sure define-predicate makes a deep contract, use quadMB to test
 
-- [ ] make contracts more efficient
-  - [ ] shorter runtime code for vector/c etc.
-  - [ ] make sure contract-expr is never an expression
-  - [ ] lift contract defs to submodule, use a cache
-
-- [ ] use `contract-first-order`
-  - is this always what I want? (only checks class/obj names)
-- [ ] are object,class,unit first-order checks "correct"?
-  - revert all changes, just apply first-order at last second
-- [ ] why use static-contracts at all?
-  - [ ] optimizations (can't do this with contracts?)
-
 - [ ] NEED to re-run Typed Racket, because these programs are different from GTP
       more require/typed
+
+- [ ] fix `values`, see `tagged-racket-test/bg/error/values.rkt`
+      issue is, (#%app f _) dones't have a type if `f` returns multiple values
+      ... not sure what TR does about this
 
 
 Functional vs. OO

@@ -6,6 +6,8 @@
 
 (+ ((A-z a) (A-x a)) (car (A-y a)))
 
+((lambda (x) x) 3)
+
 
 (: f (-> (Listof A) Integer))
 (define (f x)

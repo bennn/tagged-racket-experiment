@@ -27,6 +27,8 @@
               (void)]))
          (define (sc->contract v f)
            (unit/sc->contract v f))
+         (define (sc->tag-sc v f)
+           (raise-user-error 'sc->tag-sc "not implemented for units ~a" v))
          (define (sc->constraints v f)
            (merge-restricts* 'chaperone (map f (unit-spec->list (combinator-args v)))))])
 
@@ -86,11 +88,11 @@
         [else 
          #`(values #,@(map f lst))]))
      
-     #`(contract-first-order (unit/c
+     #`(unit/c
         (import #,@(map sig-spec->syntax imports))
         (export #,@(map sig-spec->syntax exports))
         (init-depend #,@deps)
-        #,(invokes->contract invoke/scs)))]))
+        #,(invokes->contract invoke/scs))]))
 
 (define (unit/sc imports exports init-depends invoke)
   (unit-combinator (unit-spec imports exports init-depends invoke)))

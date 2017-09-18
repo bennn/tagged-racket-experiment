@@ -30,7 +30,7 @@ recursive-sc-use:
 other:
   This is a combinator or terminal contract.
 
-These support a couple of different operations:
+These support a couple of different operations (see `structures.rkt`):
 
 sc-map: Calls a function on each sub static contract, and builds up a new static contract
 sc-traverse: Calls a function on each sub static contract
@@ -41,5 +41,5 @@ directly deals with the recursive casses.
 
 sc->contract: Turns a static contract into syntax
 sc->constraints: Turns a static contract into constraints about the contract kind
-
+sc->tag-check: Similar to `sc->contract`, but returns syntax for an O(1) "type test"
 

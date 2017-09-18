@@ -6,6 +6,9 @@
 (require "../../utils/utils.rkt"
          "../structures.rkt"
          "../constraints.rkt"
+         "derived.rkt"
+         "lengths.rkt"
+         "simple.rkt"
          racket/match
          (for-syntax racket/base racket/syntax syntax/stx syntax/parse)
          racket/set
@@ -17,10 +20,12 @@
                        racket/sequence
                        racket/promise
                        "../../utils/evt-contract.rkt"
+                       "../../utils/hash-contract.rkt"
                        "../../utils/promise-not-name-contract.rkt")
          racket/contract
          racket/async-channel)
 
+;; -----------------------------------------------------------------------------
 
 (begin-for-syntax
   (define-syntax-class variance-keyword
@@ -108,7 +113,8 @@
 
 (define-syntax (combinator-struct stx)
   (syntax-parse stx
-    [(_ sc:static-combinator-form c:expr kind:contract-category-keyword)
+    [(_ sc:static-combinator-form c:expr (~optional tag-sc:expr #:defaults ((tag-sc #'#f))) kind:contract-category-keyword)
+     #:with tag-sc-constr (if (syntax-e #'tag-sc) #'tag-sc #'sc.name)
      #'(begin
          (struct sc.struct-name combinator ()
            #:transparent
@@ -119,6 +125,10 @@
               (apply
                (sc.combinator2 (lambda (args) #`(c #,@args)))
                (map recur (combinator-args v))))
+            (define (sc->tag-sc v recur)
+              (apply tag-sc-constr
+                     (for/list ([arg (in-list (combinator-args v))])
+                       (recur arg))))
             (define (sc->constraints v recur)
               (merge-restricts* 'kind.category-stx (sc.->restricts v recur)))]
            #:methods gen:equal+hash
@@ -151,6 +161,39 @@
 (combinator-structs
   ((or/sc . (#:covariant)) or/c #:flat)
   ((and/sc . (#:covariant)) and/c #:flat)
-  ((listof/sc . (#:covariant)) listof #:flat) ;;bg ->* uses this
-  ((list/sc . (#:covariant)) list/c #:flat) ;;bg ??? uses this
 )
+
+;; -----------------------------------------------------------------------------
+;;bg ... "derived" combinators that use `and/c`
+
+(provide empty-set/sc mutable-hash?/sc immutable-hash?/sc weak-hash?/sc empty-hash/sc)
+
+(define empty-set/sc (and/sc set?/sc (flat/sc #'set-empty?)))
+(define mutable-hash?/sc (and/sc hash?/sc
+                                 (flat/sc #'(λ (h) (not (immutable? h))))
+                                 (flat/sc #'(λ (h) (not (hash-weak? h))))))
+(define immutable-hash?/sc (and/sc hash?/sc (flat/sc #'immutable?)))
+(define weak-hash?/sc (and/sc hash?/sc (flat/sc #'hash-weak?)))
+(define empty-hash/sc (and/sc hash?/sc (flat/sc #'(λ (h) (zero? (hash-count h))))))
+;; -----------------------------------------------------------------------------
+
+(combinator-structs
+  ((list/sc . (#:covariant)) list/c (λ args (list-length/sc (length args))) #:flat)
+  ((listof/sc (#:covariant)) listof (λ (_) list?/sc) #:flat)
+  ((cons/sc (#:covariant) (#:covariant)) cons/c (λ (_x _y) cons?/sc) #:flat)
+  ((set/sc (#:covariant #:chaperone)) set/c (λ (_x) set?/sc) #:flat)
+  ((vector/sc . (#:invariant)) vector/c (λ args (vector-length/sc (length args))) #:chaperone)
+  ((vectorof/sc (#:invariant)) vectorof (λ (_x) vector?/sc) #:chaperone)
+  ((promise/sc (#:covariant)) promise-not-name/c (λ (_x) promise?/sc) #:chaperone) ;;bg TODO not-name?
+  ((syntax/sc (#:covariant #:flat)) syntax/c (λ (_x) syntax?/sc) #:flat)
+  ((hash/sc (#:invariant #:flat) (#:invariant)) hash/c (λ (_x _y)hash?/sc) #:chaperone)
+  ((mutable-hash/sc (#:invariant #:flat) (#:invariant)) mutable-hash/c (λ (_x _y) mutable-hash?/sc) #:chaperone)
+  ((immutable-hash/sc (#:covariant #:flat) (#:covariant)) immutable-hash/c (λ (_x _y) immutable-hash?/sc) #:flat)
+  ((weak-hash/sc (#:invariant #:flat) (#:invariant)) weak-hash/c (λ (_x _y) weak-hash?/sc) #:chaperone)
+  ((box/sc (#:invariant)) box/c (λ (_x) box?/sc) #:chaperone)
+  ((parameter/sc (#:contravariant) (#:covariant)) parameter/c (λ (_x _y) parameter?/sc) #:chaperone)
+  ((sequence/sc . (#:covariant)) sequence/c (λ args sequence?/sc) #:impersonator)
+  ((channel/sc . (#:invariant)) channel/c (λ args channel?/sc) #:chaperone)
+  ((continuation-mark-key/sc (#:invariant)) continuation-mark-key/c (λ (_x) continuation-mark-key?/sc) #:chaperone)
+  ((evt/sc (#:covariant)) tr:evt/c (λ (_x) evt?/sc) #:chaperone) ;;bg TODO why is tr: ???
+  ((async-channel/sc (#:invariant)) async-channel/c (λ (_x) async-channel?/sc) #:chaperone))

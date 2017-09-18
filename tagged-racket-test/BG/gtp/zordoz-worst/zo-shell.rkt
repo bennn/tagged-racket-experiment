@@ -258,14 +258,14 @@
   (define arg (split-snd raw))
   (cond [(and arg (zo? ctx))
          (define results (zo-find ctx arg))
-         (printf "FIND returned ~a results\n" (length results))
+         (void "FIND returned ~a results\n" (length results))
          (match results
            ['()
             ;; No results, don't make a save mark
             (values ctx hist pre-hist)]
            [_
             ;; Success! Show the results and save them, to allow jumps
-            (printf "FIND automatically saving context\n")
+            (void "FIND automatically saving context\n")
             (print-context results)
             (save "" results (push hist ctx) pre-hist)])]
         [else
@@ -315,7 +315,7 @@
 ;; Print a history object.
 (define (print-history hist)
   ;; (-> history? void?)
-  (printf "History is: ~a\n" hist))
+  (void "History is: ~a\n" hist))
 
 ;; Print a help message for the REPL.
 (define (print-help)
@@ -340,7 +340,7 @@
      (displayln "'()")]
     [(cons x _)
      (define z (if (result? x) (result-zo x) x))
-     (printf "~a[~a]\n"
+     (void "~a[~a]\n"
              (zo->string z #:deep? #f)
              (length ctx))]
     [_
@@ -348,16 +348,16 @@
 
 ;; Print an error message (after receiving an undefined/invalid command).
 (define (print-unknown raw)
-  (printf "'~a' not permitted.\n" raw))
+  (void "'~a' not permitted.\n" raw))
 
 ;; Print a goodbye message (when the user exits the REPL).
 (define (print-goodbye)
-  (printf "Ascending to second-level meditation. Goodbye.\n\n"))
+  (void "Ascending to second-level meditation. Goodbye.\n\n"))
 
 ;; Print a debugging message.
 (define (print-debug str)
   ;; (-> string? void?)
-  (printf "DEBUG: ~a\n" str))
+  (void "DEBUG: ~a\n" str))
 
 ;; Print a welcome message (when the user enters the REPL).
 (define (print-welcome)
@@ -374,17 +374,17 @@
 ;; Print an informative message.
 (define (print-info str)
   ;; (-> string? void?)
-  (printf "INFO: ~a\n" str))
+  (void "INFO: ~a\n" str))
 
 ;; Print a warning.
 (define (print-warn str)
   ;; (-> string? void?)
-  (printf "WARN: ~a\n" str))
+  (void "WARN: ~a\n" str))
 
 ;; Print an error message.
 (define (print-error str)
   ;; (-> string? void?)
-  (printf "ERROR: ~a\n" str))
+  (void "ERROR: ~a\n" str))
 
 ;; Print usage information.
 (define USAGE
@@ -414,9 +414,9 @@
       (define ctx (zo-parse port))
       (print-info "Parsing complete! Searching...")
       (for ([arg (in-list args)])
-        (printf "FIND '~a' : " arg)
-        (printf "~a results\n" (length (zo-find ctx arg #:limit lim))))
-      (displayln "All done!"))))
+        (void "FIND '~a' : " arg)
+        (void "~a results\n" (length (zo-find ctx arg #:limit lim))))
+      (void "All done!"))))
 
 ;; Split the string `raw` by whitespace and
 ;; return the second element of the split, if any.

@@ -46,7 +46,7 @@
 
 (: main (-> Path-String Void))
 (define (main filename)
-  (define raw-hist (with-input-from-file filename read))
+  (define raw-hist (with-input-from-file filename (lambda () (read))))
   (cond
    [(list? raw-hist)
     (define hist (reverse raw-hist))

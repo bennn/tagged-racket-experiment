@@ -11,7 +11,4 @@
 
 ;; -----------------------------------------------------------------------------
 
-(define-syntax-rule (main test)
-  (with-output-to-file "/dev/null" test #:exists 'append))
-
-(time (main self-test))
+(time (self-test))

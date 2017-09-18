@@ -17,6 +17,7 @@
 
 (provide/cond-contract
  [add-typeof-expr (syntax? tc-results/c . -> . any/c)]
+ [set-typeof-expr (syntax? tc-results/c . -> . any/c)] ;;bg
  [type-of (syntax? . -> . tc-results/c)]
  [maybe-type-of (syntax? . -> . (or/c #f tc-results/c))]
  [reset-type-table (-> any/c)]
@@ -71,6 +72,9 @@
            (tooltip (cons e seen) t)))
      (tooltip (list e) t)))
   (hash-update! type-table e (λ (res) (merge-tc-results (list t res))) t))
+
+(define (set-typeof-expr e t)
+  (hash-set! type-table e t))
 
 (define (type-of e)
   (hash-ref type-table e

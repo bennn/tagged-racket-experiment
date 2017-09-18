@@ -1,8 +1,14 @@
-GO FORTH and compile the macro-versions.
+GO forth and compile the macro-versions.
 Look out for exporting structs & classes & objects.
 - [ ] PASS 1 just try to compile
 - [ ] PASS 2 look at what's exported, any trouble for current configs?
 - [ ] PASS 3 any trouble for ALL configs?
+
+- - -
+
+NOTE changed type in `lnm/main.rkt`, all keywords but `#:L` are optional.
+
+- - -
 
 - [X] acquire-worst
   - 1 : higher-order

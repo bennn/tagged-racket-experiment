@@ -3,6 +3,9 @@
 ;; Static contracts for class constructs.
 ;; Currently supports object/c and class/c.
 
+;;bg; TODO could implement sc->tag by adding a flat to sc->contract,
+;;     so when it makes a contract it adds a first-order-check
+
 (require "../../utils/utils.rkt"
          "../structures.rkt" "../constraints.rkt"
          racket/list racket/match
@@ -30,9 +33,10 @@
        (void))
      (define (sc->contract v f)
        (object/sc->contract v f))
+     (define (sc->tag-sc v f)
+       (raise-user-error 'sc->tag-sc "not implemented for object/sc ~a" v))
      (define (sc->constraints v f)
-       (merge-restricts* 'flat '())
-       #;(merge-restricts* 'impersonator (map f (member-seq->list (combinator-args v)))))])
+       (merge-restricts* 'impersonator (map f (member-seq->list (combinator-args v)))))])
 
 (struct class-combinator combinator (opaque absents)
   #:transparent
@@ -49,9 +53,10 @@
           (void)]))
      (define (sc->contract v f)
        (class/sc->contract v f))
+     (define (sc->tag-sc v f)
+       (raise-user-error 'sc->tag-sc "not implemented for class/sc ~a" v))
      (define (sc->constraints v f)
-       (merge-restricts* 'flat '())
-       #;(merge-restricts* 'impersonator (map f (member-seq->list (combinator-args v)))))])
+       (merge-restricts* 'impersonator (map f (member-seq->list (combinator-args v)))))])
 
 (struct instanceof-combinator combinator ()
   #:transparent
@@ -68,9 +73,10 @@
           (void)]))
      (define (sc->contract v f)
        (instance/sc->contract v f))
+     (define (sc->tag-sc v f)
+       (raise-user-error 'sc->tag-sc "not implemented for instance/sc ~a" v))
      (define (sc->constraints v f)
-       (merge-restricts* 'flat '())
-       #;(match v
+       (match v
          [(instanceof-combinator (list class))
           (f class)]))])
 
@@ -126,11 +132,10 @@
 (define (object/sc->contract v f) 
   (match v
    [(object-combinator (member-seq vals) opaque?)
-    #`(contract-first-order
-       (#,(if opaque?
+    #`(#,(if opaque?
              #'object/c-opaque
              #'object/c)
-       #,@(map (member-spec->form f) vals)))]))
+       #,@(map (member-spec->form f) vals))]))
 
 (define (class/sc->contract v f) 
   (match v
@@ -154,7 +159,6 @@
               vals))
     #`(let ([override-temp override-ctc] ...
             [pubment-temp pubment-ctc] ...)
-       (contract-first-order
         (class/c #,@(if opaque '(#:opaque #:ignore-local-member-names) null)
                  #,@(map (member-spec->form f) vals-rest)
                  [override-name override-temp] ...
@@ -164,12 +168,12 @@
                  [pubment-name pubment-temp] ...
                  (augment [pubment-name pubment-temp] ...)
                  (inherit [pubment-name pubment-temp] ...)
-                 (absent #,@absents))))]))
+                 (absent #,@absents)))]))
 
 (define (instance/sc->contract v f)
   (match v
    [(instanceof-combinator (list class))
-    #`(contract-first-order (instanceof/c #,(f class)))]))
+    #`(instanceof/c #,(f class))]))
 
 (provide/cond-contract
  [struct member-spec ([modifier symbol?] [id symbol?] [sc static-contract?])]

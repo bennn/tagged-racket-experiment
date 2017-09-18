@@ -25,5 +25,5 @@
 (check-exn #rx"dynamic-typecheck"
   (λ () (g (vector 3))))
 
-(check-exn exn:fail:contract?
+(check-exn #rx"dynamic-typecheck"
   (λ () (h (vector 1 'two 3))))

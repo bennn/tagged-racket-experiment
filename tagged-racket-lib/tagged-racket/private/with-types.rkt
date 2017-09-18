@@ -49,10 +49,10 @@
   (define-values (fv-ctc-ids fv-ctc-defs)
     (type-stxs->ids+defs (syntax->list fvtys) 'untyped))
   (define-values (ex-ctc-ids ex-ctc-defs)
-    (type-stxs->ids+defs (syntax->list extys) 'tagged))
+    (type-stxs->ids+defs (syntax->list extys) 'typed))
   (define-values (region-ctc-ids region-ctc-defs)
     (if expr?
-        (type-stxs->ids+defs (values-stx->type-stxs resty) 'tagged)
+        (type-stxs->ids+defs (values-stx->type-stxs resty) 'typed)
         (values null null)))
   (define region-tc-result
     (and expr? (parse-tc-results resty)))

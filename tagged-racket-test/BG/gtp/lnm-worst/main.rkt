@@ -8,15 +8,15 @@
   [rktd->spreadsheet (-> Path-String #:output Path-String #:format Symbol Void)]
 )
 (require/typed/check "lnm-plot.rkt"
- [lnm-plot (-> Summary
-               #:L (Listof Index)
-               #:N Index
+ [lnm-plot (->* [Summary
+               #:L (Listof Index)]
+               [#:N Index
                #:M Index
                #:max-overhead Index
                #:cutoff-proportion Float
                #:num-samples Positive-Integer
                #:plot-height Positive-Integer
-               #:plot-width Positive-Integer
+               #:plot-width Positive-Integer]
                (Listof Any))]
 )
 ;; Just testing
