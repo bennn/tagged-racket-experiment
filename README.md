@@ -46,3 +46,10 @@ Limitations
 A `tagged/racket` module cannot share type definitions with a `typed/racket`
  module.
 
+
+Alternative
+---
+
+<https://github.com/nuprl/tag-sound>
+
+
